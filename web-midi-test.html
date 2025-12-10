@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MIDI Test</title>
+</head>
+<body>
+    <h1>MIDI Input Test</h1>
+    <div id="status">Checking MIDI support...</div>
+    <div id="output"></div>
+
+    <script>
+        const statusDiv = document.getElementById('status');
+        const outputDiv = document.getElementById('output');
+
+        navigator.requestMIDIAccess = navigator.requestMIDIAccess || navigator.webkitRequestMIDIAccess;
+        if (navigator.requestMIDIAccess) {
+            navigator.requestMIDIAccess()
+            .then(onMIDISuccess, onMIDIFailure);
+        } else if (navigator.webkitRequestMIDIAccess) {
+            console.log(navigator.requestMIDIAccess());
+            statusDiv.textContent = 'Web MIDI API not supported in this browser';
+
+        }
+
+        function onMIDISuccess(midiAccess) {
+            statusDiv.textContent = 'MIDI ready. Play some notes.';
+            
+            for (let input of midiAccess.inputs.values()) {
+                input.onmidimessage = handleMIDIMessage;
+            }
+        }
+
+        function onMIDIFailure() {
+            statusDiv.textContent = 'Failed to get MIDI access';
+        }
+
+        function handleMIDIMessage(message) {
+            const [command, note, velocity] = message.data;
+            const timestamp = message.timeStamp;
+            
+            // 144 = noteOn, 128 = noteOff
+            const eventType = command === 144 ? 'NOTE ON' : 'NOTE OFF';
+            const noteName = getNoteNameFromMIDI(note);
+            
+            outputDiv.innerHTML = `
+                <strong>${eventType}</strong><br>
+                MIDI Note: ${note} (${noteName})<br>
+                Velocity: ${velocity}<br>
+                Timestamp: ${timestamp.toFixed(2)}ms<br>
+                <hr>
+            ` + outputDiv.innerHTML;
+        }
+
+        function getNoteNameFromMIDI(midiNote) {
+            const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+            const octave = Math.floor(midiNote / 12) - 1;
+            const noteName = noteNames[midiNote % 12];
+            return `${noteName}${octave}`;
+        }
+    </script>
+</body>
+</html>
