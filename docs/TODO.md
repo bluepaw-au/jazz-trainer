@@ -1,6 +1,6 @@
 # Implementation Checklist
 
-## Current Status: 🔨 Phase 2 - Backend Setup In Progress
+## Current Status: ✅ Phase 2 - Backend Setup Complete | 🔜 Phase 2 - Frontend Setup Next
 
 ---
 
@@ -22,12 +22,12 @@
 - [x] Install dependencies (express, better-sqlite3, cors)
 - [x] Create database schema (use `DATABASE_SCHEMA.md` as reference)
 - [x] Create database initialization script
-- [ ] Set up basic Express server structure
+- [x] Set up basic Express server structure
 - [x] Create SQLite database connection module
-- [ ] Create API endpoint: `POST /api/rounds` (start new round)
-- [ ] Create API endpoint: `POST /api/attempts` (log attempt)
-- [ ] Create API endpoint: `GET /api/rounds` (fetch round history)
-- [ ] Test endpoints with curl or Postman
+- [x] Create API endpoint: `POST /api/rounds` (start new round)
+- [x] Create API endpoint: `POST /api/attempts` (log attempt)
+- [x] Create API endpoint: `GET /api/rounds` (fetch round history)
+- [x] Test endpoints with curl or Postman
 
 ### Frontend Setup
 - [ ] Initialize React project (Vite or Create React App)

@@ -109,6 +109,28 @@ SQLite Database (database.db)
 
 ## Validation Logic
 
+### Backend Request Validation
+**Decision:** Validate all incoming request bodies against expected schema.
+
+**Strategy:**
+- Check for null/undefined: `field != null` (catches both)
+- Type checking: `typeof field === 'type'`
+- Optional fields: `(field == null || typeof field === 'type')`
+- Boolean conversion: SQLite requires integers, convert `true/false` to `1/0`
+
+**Implementation Pattern:**
+```javascript
+const isValid =
+    data.required_field != null && typeof data.required_field === 'string' &&
+    (data.optional_field == null || typeof data.optional_field === 'number');
+
+if (!isValid) {
+    return res.status(400).json({ error: 'Invalid request format' });
+}
+```
+
+**Rationale:** Defense in depth—frontend validation prevents accidents, backend validation prevents bugs.
+
 ### Exact Match Required (MVP)
 **Decision:** Played note must exactly match expected MIDI note number.
 
@@ -234,12 +256,18 @@ Create `formatters.ts` with:
 **Purpose:** Separate domain logic (numbers) from presentation (strings). Database stores numbers, UI displays formatted strings.
 
 ### Timestamps
-Store as JavaScript timestamps (milliseconds since epoch):
+Store as Unix timestamps (seconds since epoch) as REAL in SQLite:
 ```javascript
-const timestamp = Date.now(); // e.g., 1702234567890
+const timestamp = Date.now() / 1000; // e.g., 1702345678.123
 ```
 
-Store as REAL in SQLite, convert to DATETIME for readability in queries.
+**Why seconds instead of milliseconds:**
+- SQLite REAL type stores floating-point numbers, preserving millisecond precision as decimals
+- Provides fractional second precision useful for timing data (e.g., response_time_ms)
+- Standard Unix timestamp format
+
+**Storage:** REAL in SQLite, with `DEFAULT CURRENT_TIMESTAMP` for auto-generated timestamps
+**Display:** Convert to human-readable format in UI as needed
 
 ### Note Name Conversion
 ```javascript
