@@ -27,3 +27,6 @@ npm-debug.log*
 # Build outputs
 dist/
 build/
+
+# Personal
+docs/PERSONAL_PREFERENCES.md
