@@ -61,7 +61,7 @@ export function createRound(data) {
 }
 
 export function createAttempt(data) {
-    insertAttemptStatement.run(
+    const info = insertAttemptStatement.run(
         data.round_id,
         data.root_note_midi,
         data.root_note_name,
@@ -70,12 +70,13 @@ export function createAttempt(data) {
         data.expected_note_name,
         data.played_note_midi,
         data.played_note_name,
-        data.correct,
+        data.correct ? 1 : 0, // Store boolean as integer 1 (true) or 0 (false)
         data.prompt_displayed_at,
         data.root_note_played_at,
         data.interval_note_played_at,
         data.attempt_completed_at
     );
+    return info.lastInsertRowid;
 }
 
 export function getRounds(limit = 10) {
