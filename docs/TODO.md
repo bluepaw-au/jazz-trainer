@@ -1,6 +1,13 @@
 # Implementation Checklist
 
-## Current Status: ✅ Phase 2 - Backend Setup Complete | 🔜 Phase 2 - Frontend Setup Next
+## Current Status: ✅ Phase 2 - Backend Complete | 📋 Frontend Architecture Complete | 🔜 Phase 2 - Frontend Implementation Next
+
+**Last Updated:** 2025-12-11 (Session 3)
+
+**Reference Documents:**
+- [Frontend Architecture](/docs/FRONTEND_ARCHITECTURE.md) - Complete architectural design
+- [Technical Context](/docs/TECHNICAL_CONTEXT.md) - Technical decisions and patterns
+- [Database Schema](/docs/DATABASE_SCHEMA.md) - Data model
 
 ---
 
@@ -17,31 +24,100 @@
 
 ## Phase 2: Foundation Setup
 
-### Backend Setup
+### Backend Setup ✅ COMPLETE
 - [x] Initialize Node/Express project
 - [x] Install dependencies (express, better-sqlite3, cors)
-- [x] Create database schema (use `DATABASE_SCHEMA.md` as reference)
+- [x] Create database schema
 - [x] Create database initialization script
 - [x] Set up basic Express server structure
 - [x] Create SQLite database connection module
-- [x] Create API endpoint: `POST /api/rounds` (start new round)
+- [x] Create API endpoint: `POST /api/rounds` (create completed round)
 - [x] Create API endpoint: `POST /api/attempts` (log attempt)
 - [x] Create API endpoint: `GET /api/rounds` (fetch round history)
-- [x] Test endpoints with curl or Postman
+- [x] Test endpoints with curl
 
-### Frontend Setup
-- [ ] Initialize React project (Vite or Create React App)
-- [ ] Install dependencies (none required for MVP beyond React)
-- [ ] Set up project structure (components, utils, types)
-- [ ] Create `formatters.ts` utility file
+### Frontend Architecture 📋 COMPLETE
+- [x] Define directory structure (screens, components, hooks, services, utils, config)
+- [x] Choose state management approach (useReducer for game logic)
+- [x] Design MIDI integration strategy (useMIDI hook)
+- [x] Define data flow patterns (MIDI → game logic → API → UI)
+- [x] Document TypeScript interfaces matching backend contracts
+- [x] Define round completion flow (Option B: create round at end, queue attempts in memory)
+- [x] Define error handling strategy (simple alert() dialogs for MVP)
+- [x] Define correction mechanic (no escape hatch, must complete)
+- [x] Decide on UI approach (text display only, no visual keyboard for MVP)
+
+**Key Decisions:**
+- Round created at completion with accurate totals (acceptable data loss on refresh)
+- Simple alert() error dialogs (no fancy UI)
+- No correction escape hatch (must find correct interval)
+- No state persistence on refresh (acceptable)
+- No API retry logic (just show error)
+- Text-only prompt display (visual keyboard deferred)
+
+### Frontend Implementation 🔜 NEXT
+- [ ] Initialize Vite React TypeScript project
+- [ ] Create directory structure (screens/, components/, hooks/, services/, utils/, config/)
+- [ ] Create `src/utils/types.ts` - TypeScript interfaces
+  - [ ] Prompt, RoundData, AttemptData, RoundResponse, LessonConfig types
+- [ ] Create `src/utils/midi.ts` - MIDI utility functions
   - [ ] `midiToNoteName()` function
+  - [ ] `calculateIntervalTarget()` function
+- [ ] Create `src/utils/formatters.ts` - Display formatters
   - [ ] `semitonesToIntervalName()` function
-  - [ ] Timing calculation functions
-- [ ] Create `types.ts` for TypeScript interfaces (Attempt, Round, etc.)
+  - [ ] `formatDuration()` function
+  - [ ] `calculateReactionTime()` function
+  - [ ] `calculateExecutionTime()` function
+- [ ] Create `src/config/lessons.ts` - Lesson configurations
+  - [ ] LESSON_CONFIGS constant with intervals_ascending
+  - [ ] DEFAULT_LESSON constant
+- [ ] Create `src/services/api.ts` - Backend HTTP communication
+  - [ ] `createRound()` function
+  - [ ] `logAttempt()` function
+  - [ ] `getRounds()` function
+  - [ ] Ensure timestamp conversion (Date.now() / 1000)
+- [ ] Create `src/hooks/useMIDI.ts` - MIDI device I/O
+  - [ ] Request MIDI access
+  - [ ] Parse MIDI messages (noteOn/noteOff)
+  - [ ] Handle velocity=0 as noteOff
+  - [ ] Convert timestamps to Unix seconds
+  - [ ] Error handling (not supported, access denied, no devices)
+- [ ] Create `src/hooks/useGameLogic.ts` - Game state machine
+  - [ ] Define GameState type and reducer
+  - [ ] Implement state machine (waiting → root_played → interval_played → correction → complete)
+  - [ ] Implement prompt generation
+  - [ ] Implement validation logic (exact match)
+  - [ ] Implement correction mechanic (hold timers, no escape)
+  - [ ] Implement round completion (Option B: batch create round + attempts)
+  - [ ] Side-effect handling via useEffect (API calls)
+- [ ] Create `src/components/PromptDisplay.tsx` - Text-only prompt display
+  - [ ] Display current root note and interval name
+  - [ ] Display attempt index / total attempts
+  - [ ] Correction state feedback ("Hold C4... now hold E4...")
+- [ ] Create `src/components/ScoreDisplay.tsx` - Score and timer
+  - [ ] Display correct/total score
+  - [ ] Display elapsed time
+  - [ ] Display accuracy percentage
+- [ ] Create `src/screens/GameScreen.tsx` - Active practice session
+  - [ ] Wire useMIDI and useGameLogic hooks together
+  - [ ] Manage elapsed time state
+  - [ ] Render PromptDisplay and ScoreDisplay
+  - [ ] Handle round completion transition to ResultsScreen
+- [ ] Create `src/screens/ResultsScreen.tsx` - Post-round summary
+  - [ ] Fetch round history from API
+  - [ ] Display last round summary
+  - [ ] Display simple list of past rounds
+  - [ ] "Start New Round" button
+- [ ] Create `src/App.tsx` - Top-level app
+  - [ ] Screen routing (game vs results)
+  - [ ] Load config from lessons.ts
+  - [ ] Pass config to GameScreen
+- [ ] Create `src/main.tsx` - Vite entry point
+  - [ ] Mount React app
 
 ### Development Environment
 - [ ] Set up concurrent dev script (run backend + frontend together)
-- [ ] Configure CORS for local development
+- [ ] CORS already configured in backend (allows all origins)
 - [ ] Test backend/frontend communication
 
 ---
